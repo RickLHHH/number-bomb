@@ -1,0 +1,27 @@
+{
+  "name": "number-bomb-game",
+  "version": "1.0.0",
+  "description": "数字炸弹 - 线上实时对战版。一个基于 WebSocket 的双人猜数字游戏，支持创建房间、实时对战。",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "docker:build": "docker build -t number-bomb .",
+    "docker:run": "docker run -p 3000:3000 number-bomb"
+  },
+  "keywords": [
+    "game",
+    "websocket",
+    "multiplayer",
+    "number-guess",
+    "real-time"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "ws": "^8.14.2"
+  }
+}
