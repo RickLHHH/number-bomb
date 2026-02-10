@@ -63,14 +63,9 @@ const wss = new WebSocket.Server({
 // 房间管理
 const rooms = new Map();
 
-// 生成房间ID（排除易混淆字符）
+// 生成房间ID（6位纯数字）
 function generateRoomId() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let result = '';
-    for (let i = 0; i < 6; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
+    return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 // 广播消息给房间内所有玩家
@@ -163,7 +158,7 @@ wss.on('connection', (ws, req) => {
                     break;
                     
                 case 'JOIN_ROOM':
-                    const joinRoomId = message.roomId.toUpperCase();
+                    const joinRoomId = message.roomId;
                     const room = rooms.get(joinRoomId);
                     
                     if (!room) {

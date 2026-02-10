@@ -762,8 +762,8 @@
                 
                 <div class="input-wrapper">
                     <input type="text" class="digit-input" id="join-room-input" 
-                           maxlength="6" placeholder="ABC123" 
-                           style="text-transform: uppercase; letter-spacing: 15px;">
+                           maxlength="6" placeholder="000000" 
+                           style="letter-spacing: 15px;" inputmode="numeric" pattern="[0-9]*">
                 </div>
                 
                 <div class="btn-group">
@@ -1063,7 +1063,7 @@
         }
         
         function joinRoom() {
-            const roomId = document.getElementById('join-room-input').value.trim().toUpperCase();
+            const roomId = document.getElementById('join-room-input').value.trim();
             if (!roomId) {
                 showToast('请输入房间号', 'error');
                 return;
