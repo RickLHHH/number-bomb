@@ -2,8 +2,22 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a1a">
+    <meta name="description" content="数字炸弹 - 双人线上实时对战猜数字游戏">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="💣 数字炸弹 - 线上对战">
+    <meta property="og:description" content="双人实时对战猜数字游戏，创建房间即可开始！">
+    <meta property="og:type" content="website">
+    
     <title>💣 数字炸弹 - 线上对战</title>
+    
+    <!-- QRCode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap');
         
@@ -636,6 +650,189 @@
             margin-top: 15px;
         }
         
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loading-content {
+            text-align: center;
+        }
+        
+        .loading-logo {
+            font-size: 5em;
+            animation: bounce 1s ease infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .loading-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        .loading-bar {
+            width: 250px;
+            height: 6px;
+            background: var(--glass);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0 auto 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .loading-progress {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--primary);
+        }
+        
+        .loading-status {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            animation: pulse-text 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-text {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        /* QR Code Container */
+        .qr-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--glass);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+        
+        .qr-title {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        #qr-canvas {
+            padding: 10px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        #qr-canvas img {
+            display: block;
+        }
+        
+        /* Share Buttons */
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .btn-small {
+            padding: 10px 20px;
+            font-size: 0.9em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .copy-feedback {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--success);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 5000;
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .copy-feedback.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* Sound Toggle */
+        .sound-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 1.3em;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .sound-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+        
+        .sound-toggle.muted {
+            opacity: 0.5;
+        }
+        
         /* 响应式 */
         @media (max-width: 600px) {
             .logo {
@@ -667,6 +864,18 @@
 </head>
 <body>
     <div class="bg-animation"></div>
+    
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">💣</div>
+            <div class="loading-text">数字炸弹</div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <div class="loading-status">正在连接服务器...</div>
+        </div>
+    </div>
     
     <!-- 连接状态 -->
     <div class="connection-status">
@@ -732,6 +941,22 @@
                     </p>
                     <div style="margin-top: 20px;">
                         <span class="loader"></span>
+                    </div>
+                </div>
+                
+                <!-- QR Code & Share -->
+                <div class="qr-section">
+                    <div class="qr-title">📱 扫码加入</div>
+                    <div class="qr-container">
+                        <div id="qr-canvas"></div>
+                        <div class="share-buttons">
+                            <button class="btn btn-primary btn-small" onclick="copyRoomLink()">
+                                📋 复制链接
+                            </button>
+                            <button class="btn btn-secondary btn-small" onclick="shareRoom()">
+                                📤 分享
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -968,8 +1193,10 @@
                     currentRoom = data.roomId;
                     playerId = data.playerId;
                     document.getElementById('created-room-id').textContent = data.roomId;
+                    generateQRCode(data.roomId);
                     showScreen('screen-create');
                     showToast('房间创建成功！', 'success');
+                    SoundFX.play('success');
                     break;
                     
                 case 'ROOM_JOINED':
@@ -1004,6 +1231,7 @@
                     showScreen('screen-game');
                     updateTurnIndicator();
                     showToast(data.message, 'success');
+                    SoundFX.play('start');
                     break;
                     
                 case 'GUESS_RESULT':
@@ -1013,13 +1241,17 @@
                     
                     if (data.playerId === playerId) {
                         showToast(`你的猜测结果: ${data.result}A`, 'info');
+                        SoundFX.play(data.result > 0 ? 'correct' : 'guess');
                     } else {
                         showToast(`对手猜测 ${data.guess}，结果: ${data.result}A`, 'info');
                     }
                     break;
                     
                 case 'GAME_OVER':
+                    const isWinner = data.winner === playerId;
                     showWinner(data.winner, data.winningNumber);
+                    SoundFX.play(isWinner ? 'win' : 'gameOver');
+                    if (isWinner) Confetti.burst();
                     break;
                     
                 case 'RESET_GAME':
@@ -1227,6 +1459,299 @@
         
         // 初始化连接
         connect();
+        
+        // ==================== Loading Screen ====================
+        function updateLoadingProgress(progress, status) {
+            document.querySelector('.loading-progress').style.width = progress + '%';
+            if (status) {
+                document.querySelector('.loading-status').textContent = status;
+            }
+        }
+        
+        function hideLoadingScreen() {
+            const loadingScreen = document.getElementById('loading-screen');
+            loadingScreen.classList.add('hidden');
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 500);
+        }
+        
+        // 模拟加载进度
+        let loadProgress = 0;
+        const loadInterval = setInterval(() => {
+            loadProgress += Math.random() * 30;
+            if (loadProgress >= 100) {
+                loadProgress = 100;
+                clearInterval(loadInterval);
+                updateLoadingProgress(100, '准备就绪！');
+                setTimeout(hideLoadingScreen, 300);
+            } else {
+                updateLoadingProgress(loadProgress);
+            }
+        }, 200);
+        
+        // ==================== QR Code Generator ====================
+        function generateQRCode(roomId) {
+            const container = document.getElementById('qr-canvas');
+            container.innerHTML = '';
+            
+            const shareUrl = window.location.origin + '?room=' + roomId;
+            
+            new QRCode(container, {
+                text: shareUrl,
+                width: 140,
+                height: 140,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+        
+        // ==================== Share & Copy ====================
+        async function copyRoomLink() {
+            if (!currentRoom) return;
+            
+            const shareUrl = window.location.origin + '?room=' + currentRoom;
+            
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+                showCopyFeedback();
+                SoundFX.play('click');
+            } catch (err) {
+                // Fallback
+                const textArea = document.createElement('textarea');
+                textArea.value = shareUrl;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showCopyFeedback();
+            }
+        }
+        
+        function showCopyFeedback() {
+            const feedback = document.getElementById('copy-feedback');
+            feedback.classList.add('show');
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 2000);
+        }
+        
+        async function shareRoom() {
+            if (!currentRoom) return;
+            
+            const shareData = {
+                title: '💣 数字炸弹',
+                text: `来和我一起玩数字炸弹！房间号：${currentRoom}`,
+                url: window.location.origin + '?room=' + currentRoom
+            };
+            
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    console.log('Share cancelled');
+                }
+            } else {
+                copyRoomLink();
+            }
+        }
+        
+        // ==================== Sound Effects ====================
+        const SoundFX = {
+            enabled: true,
+            context: null,
+            
+            init() {
+                if (!this.context) {
+                    this.context = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+            
+            playTone(frequency, duration, type = 'sine', volume = 0.3) {
+                if (!this.enabled || !this.context) return;
+                
+                const oscillator = this.context.createOscillator();
+                const gainNode = this.context.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.context.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = type;
+                
+                gainNode.gain.setValueAtTime(volume, this.context.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + duration);
+                
+                oscillator.start(this.context.currentTime);
+                oscillator.stop(this.context.currentTime + duration);
+            },
+            
+            play(sound) {
+                if (!this.enabled) return;
+                this.init();
+                
+                // Resume context if suspended (browser policy)
+                if (this.context.state === 'suspended') {
+                    this.context.resume();
+                }
+                
+                const sounds = {
+                    click: () => this.playTone(800, 0.08, 'sine', 0.2),
+                    guess: () => {
+                        this.playTone(600, 0.1, 'sine', 0.25);
+                        setTimeout(() => this.playTone(800, 0.15, 'sine', 0.25), 50);
+                    },
+                    correct: () => {
+                        this.playTone(500, 0.1, 'sine', 0.25);
+                        setTimeout(() => this.playTone(700, 0.1, 'sine', 0.25), 100);
+                        setTimeout(() => this.playTone(900, 0.2, 'sine', 0.3), 200);
+                    },
+                    win: () => {
+                        [523, 659, 784, 1047, 1319].forEach((freq, i) => {
+                            setTimeout(() => this.playTone(freq, 0.15, 'sine', 0.35), i * 80);
+                        });
+                    },
+                    gameOver: () => {
+                        this.playTone(300, 0.3, 'sawtooth', 0.3);
+                        setTimeout(() => this.playTone(250, 0.4, 'sawtooth', 0.3), 300);
+                    },
+                    start: () => {
+                        this.playTone(440, 0.1, 'sine', 0.25);
+                        setTimeout(() => this.playTone(554, 0.1, 'sine', 0.25), 100);
+                        setTimeout(() => this.playTone(659, 0.2, 'sine', 0.3), 200);
+                    },
+                    success: () => {
+                        this.playTone(880, 0.1, 'sine', 0.25);
+                        setTimeout(() => this.playTone(1100, 0.15, 'sine', 0.3), 100);
+                    },
+                    error: () => {
+                        this.playTone(200, 0.2, 'sawtooth', 0.25);
+                    }
+                };
+                
+                if (sounds[sound]) {
+                    sounds[sound]();
+                }
+            }
+        };
+        
+        function toggleSound() {
+            SoundFX.enabled = !SoundFX.enabled;
+            const btn = document.getElementById('sound-toggle');
+            btn.textContent = SoundFX.enabled ? '🔊' : '🔇';
+            btn.classList.toggle('muted', !SoundFX.enabled);
+            
+            if (SoundFX.enabled) {
+                SoundFX.init();
+                SoundFX.play('click');
+            }
+        }
+        
+        // Initialize sound on first user interaction
+        document.addEventListener('click', () => {
+            SoundFX.init();
+        }, { once: true });
+        
+        // ==================== Confetti Animation ====================
+        const Confetti = {
+            canvas: null,
+            ctx: null,
+            particles: [],
+            
+            init() {
+                if (!this.canvas) {
+                    this.canvas = document.createElement('canvas');
+                    this.canvas.style.cssText = 'position:fixed;top:0;left:0;pointer-events:none;z-index:9999;';
+                    document.body.appendChild(this.canvas);
+                    this.ctx = this.canvas.getContext('2d');
+                    this.resize();
+                    window.addEventListener('resize', () => this.resize());
+                }
+            },
+            
+            resize() {
+                if (this.canvas) {
+                    this.canvas.width = window.innerWidth;
+                    this.canvas.height = window.innerHeight;
+                }
+            },
+            
+            createParticle() {
+                const colors = ['#00f5ff', '#ff00ff', '#00ff88', '#ffeb3b', '#ff3860', '#ffffff'];
+                return {
+                    x: Math.random() * this.canvas.width,
+                    y: -20,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 8 + 4,
+                    speedY: Math.random() * 3 + 2,
+                    speedX: Math.random() * 4 - 2,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 10 - 5
+                };
+            },
+            
+            burst() {
+                this.init();
+                for (let i = 0; i < 80; i++) {
+                    this.particles.push(this.createParticle());
+                }
+                this.animate();
+            },
+            
+            animate() {
+                if (this.particles.length === 0) {
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    return;
+                }
+                
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.particles.forEach((p, i) => {
+                    p.y += p.speedY;
+                    p.x += p.speedX;
+                    p.rotation += p.rotationSpeed;
+                    p.speedY += 0.1; // gravity
+                    
+                    this.ctx.save();
+                    this.ctx.translate(p.x, p.y);
+                    this.ctx.rotate((p.rotation * Math.PI) / 180);
+                    this.ctx.fillStyle = p.color;
+                    this.ctx.shadowBlur = 10;
+                    this.ctx.shadowColor = p.color;
+                    this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    this.ctx.restore();
+                    
+                    if (p.y > this.canvas.height) {
+                        this.particles.splice(i, 1);
+                    }
+                });
+                
+                requestAnimationFrame(() => this.animate());
+            }
+        };
+        
+        // ==================== Auto-join from URL ====================
+        function checkUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const roomId = params.get('room');
+            if (roomId && /^\d{6}$/.test(roomId)) {
+                document.getElementById('join-room-input').value = roomId;
+                setTimeout(() => {
+                    showScreen('screen-join');
+                }, 500);
+            }
+        }
+        
+        // Check URL params after loading
+        setTimeout(checkUrlParams, 1000);
     </script>
-</body>
+    
+    <!-- Sound Toggle -->
+    <button id="sound-toggle" class="sound-toggle" onclick="toggleSound()" title="开关音效">
+        🔊
+    </button>
+    
+    <!-- Copy Feedback -->
+    <div id="copy-feedback" class="copy-feedback">✅ 已复制到剪贴板！</div>
 </html>
